@@ -1,16 +1,25 @@
 body{
     display: flex;
     justify-content: center;
-    align-items: center;
-    
+
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-image: url("back_image.jpg");
+}
+
+#boss{
+    top: 20%;
+    position: absolute;
 }
 
 .week{
     display: flex;
     justify-content: center;
     flex-direction: row;
-    background-color: #ace0eb;
-    width: 700px;
+    background-color: rgba(172, 224, 235, 0.50);
+    width: 750px;
     border-radius: 0 0 20px 20px;
 }
 
@@ -20,7 +29,7 @@ body{
 
 #search{
     background-color: rgb(246, 225, 75);
-    width: 700px;
+    width: 750px;
     height: 70px;
     border-radius: 20px 20px 0 0;
     display: flex;
@@ -54,6 +63,10 @@ body{
     line-height: 35px;
 }
 
+#search button:hover{
+    cursor: pointer;
+}
+
 #search input:focus, #search button:focus {
     outline: none;
 }
@@ -67,26 +80,28 @@ body{
 }
 
 .get_city{
-    background: linear-gradient(to bottom, #7bbccb 30%, #ace0eb 100%);
+    background: linear-gradient(to bottom, #7bbccb 30%, rgba(172, 224, 235, 0.5) 100%);
     font-size: 22pt;
     font-family: Impact, sans-serif;
-    width: 630px;
+    width: 665px;
     height: 30px;
-    padding: 10px 0 10px 70px;
+    padding: 10px 0 10px 85px;
     color: #ffffff;
 }
 #get_city{
     border-bottom: #000000 solid 2px;
+    border-radius: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .days{
-    margin: 15px 5px 15px 5px;
+    margin: 15px 2px 15px 2px;
     padding: 5px;
     border-radius: 10px;
-    height: 175px;
-    width: 80px;
-    background-color: #ace0eb;
-
+    height: 155px;
+    width: 90px;
+    background-color: rgba(172, 224, 235, 0.31);
 }
 
 .main{
@@ -99,13 +114,30 @@ body{
     border-bottom: white solid 2px;
     position: relative;
     width: 100%;
-    margin-bottom: 5px;
+    margin-bottom: 15px;
     font-size: 18pt;
+    border-radius: 7px;
+}
+
+.main_info{
+    border-radius: 10px;
+}
+.main_info:hover{
+    cursor: pointer;
+    color: #ffffff;
 }
 
 .info{
-    font-size: 14pt;
-    font-family: sans-serif;
+    font-size: 13pt;
+    font-family: Impact, sans-serif;
+    text-align: center;
+    border-radius: 10px;
+}
+
+
+.info:hover{
+    cursor: pointer;
+    border-bottom: solid 2px #ffffff;
 }
 
 .min_day_temp{
