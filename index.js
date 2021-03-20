@@ -3,24 +3,39 @@
 //     "current,minutely,alerts&lang=ru&units=metric&appid=6b70c540feba0fdeebeb7eb39708b7e7";
 
 
-// $('div#pn div.main_info').click(function () {
-//     $('div#pn div.info').slideDown();
-//     $('div#pn div.main_info').slideUp();
-//     $('div#pn div.main_info').hidden = true;
-// });
-//
-// $('div#pn div.info').click(function () {
-//     $('div#pn div.info').slideUp();
-//     $('div#pn div.main_info').slideDown();
-// });
+function draw(nameOfDay) {
+    $('<div class="days"></div>').attr('id', nameOfDay).appendTo('.week');
+    $(`#${nameOfDay}`).append('<div class="main">\n' +
+        '            <div class="day">Пн</div>\n' +
+        '            <div class="main_info">\n' +
+        '            <span class="max_day_temp">-2</span><br>\n' +
+        '            <span class="min_day_temp">-9</span>\n' +
+        '            </div>\n' +
+        '        </div>\n' +
+        '        <div class="moreInfo">\n' +
+        '            <div class="info" hidden>\n' +
+        '                <span class="morn_temp">Утро: -15</span><br>\n' +
+        '                <span class="day_temp">День: -5</span><br>\n' +
+        '                <span class="ev_temp">Вечер: -10</span><br>\n' +
+        '                <span class="night_temp">Ночь: -17</span>\n' +
+        '            </div>\n' +
+        '        </div>');
+    slide(nameOfDay);
+}
 
-$('.main_info').click(function () {
-    $('.info').slideDown();
-    $('.main_info').slideUp();
-    $('.main_info').hidden = true;
-});
+draw("pn");
 
-$('.info').click(function () {
-    $('.info').slideUp();
-    $('.main_info').slideDown();
-});
+function slide (nameOfDay) {
+    let id = '#'+ nameOfDay;
+    $(`${id} .main_info`).click(function () {
+        $(id + ' .info').slideDown();
+        $(id + ' .main_info').slideUp();
+        $(id + ' .main_info').hidden = true;
+    });
+
+    $(id + ' .info').click(function () {
+        $(id + ' .info').slideUp();
+        $(id + ' .main_info').slideDown();
+    });
+}
+
