@@ -24,9 +24,13 @@ const setCity = document.getElementById('set_city');
 const getWeatherButton = $('#getWeather');
 
 getWeatherButton.click(() => {
-        if (setCity.value !== "") {
-            return nazvanie(setCity.value)
-        }
+
+            let city = setCity.value;
+            setCity.value = "";
+            document.getElementsByClassName("week")[0].innerHTML = "";
+            document.getElementsByClassName("get_city")[0].innerHTML = "";
+            return nazvanie(city);
+
     }
 );
 
@@ -34,8 +38,9 @@ getWeatherButton.click(() => {
 async function nazvanie(nameOfCity){
     let weatherWeek = await getWeatherFromApi(nameOfCity); //вернет объект с данными по темпиратурке, а не промис
     for(let i = 0; i < 7; i++){
-        draw(getNameIDOfDay(new Date((weatherWeek.daily[i].dt)*1000).getDay()), new WeatherDay(new Date((weatherWeek.daily[i].dt)*1000).getDay(), weatherWeek.daily[i].temp.max, weatherWeek.daily[i].temp.min, weatherWeek.daily[i].temp.morn, weatherWeek.daily[i].temp.day, weatherWeek.daily[i].temp.eve, weatherWeek.daily[i].temp.night))
+        draw(getNameIDOfDay(new Date((weatherWeek.daily[i].dt)*1000)), new WeatherDay(new Date((weatherWeek.daily[i].dt)*1000), weatherWeek.daily[i].temp.max, weatherWeek.daily[i].temp.min, weatherWeek.daily[i].temp.morn, weatherWeek.daily[i].temp.day, weatherWeek.daily[i].temp.eve, weatherWeek.daily[i].temp.night))
     }
+    highlightsToday();
 }
 
 
@@ -59,22 +64,23 @@ function drawGetCity(nameOfCity) {
 }
 
 
-function draw(nameOfDay , weatherDay) {
+function draw(nameOfDay, weatherDay) {
     $('<div class="days"></div>').attr('id', nameOfDay).appendTo('.week');
     $(`#${nameOfDay}`).append('<div class="main">\n' +
-        '            <div class="day">'+weatherDay.weekDay+'</div>\n' +
+        '            <div class="day">' + weatherDay.weekDay + '</div>\n' +
         '            <div class="main_info">\n' +
-        '            <span class="max_day_temp">'+`${weatherDay.maxTemp}`+'</span><br>\n' +
-        '            <span class="min_day_temp">'+`${weatherDay.minTemp}`+'</span>\n' +
+        '            <span class="max_day_temp">' + `${weatherDay.maxTemp}` + '</span><br>\n' +
+        '            <span class="min_day_temp">' + `${weatherDay.minTemp}` + '</span>\n' +
         '            </div>\n' +
         '        </div>\n' +
         '        <div class="moreInfo">\n' +
         '            <div class="info" hidden>\n' +
-        '                <span class="morn_temp">Утро: '+`${weatherDay.morn}`+'</span><br>\n' +
-        '                <span class="day_temp">День: '+`${weatherDay.day}`+'</span><br>\n' +
-        '                <span class="ev_temp">Вечер: '+`${weatherDay.eve}`+'</span><br>\n' +
-        '                <span class="night_temp">Ночь: '+`${weatherDay.night}`+'</span>\n' +
-        '            </div>\n' +
+        '                <span class="morn_temp">Утро: ' + `${weatherDay.morn}` + '</span><br>\n' +
+        '                <span class="day_temp">День: ' + `${weatherDay.day}` + '</span><br>\n' +
+        '                <span class="ev_temp">Вечер: ' + `${weatherDay.eve}` + '</span><br>\n' +
+        '                <span class="night_temp">Ночь: ' + `${weatherDay.night}` + '</span>\n' +
+        '            </div><br>\n' +
+        '            <div class="date">' + `${weatherDay.date}` + '</div>\n' +
         '        </div>');
     slide(nameOfDay);
 }
@@ -87,28 +93,34 @@ function slide (nameOfDay) {
         $(id + ' .info').slideDown();
         $(id + ' .main_info').slideUp();
         $(id + ' .main_info').hidden = true;
+
+        $(id + ' .date').fadeToggle();
+        $(id + ' .date').hidden = true;
     });
 
     $(id + ' .info').click(function () {
         $(id + ' .info').slideUp();
         $(id + ' .main_info').slideDown();
+
+        $(id + ' .date').fadeToggle();
     });
 }
 
 class WeatherDay {
-    constructor(weekDay, maxTemp, minTemp, morn, day, eve, night) {
-        this.weekDay = getNameOfDay(weekDay);
+    constructor(date, maxTemp, minTemp, morn, day, eve, night) {
+        this.weekDay = getNameOfDay(date);
         this.maxTemp = maxTemp;
         this.minTemp = minTemp;
         this.morn = morn;
         this.day = day;
         this.eve = eve;
         this.night = night;
+        this.date = getDateForDraw(date);
     }
 }
 
 function getNameOfDay(num) {
-    switch (num) {
+    switch (num.getDay()) {
         case 0 :
         return "ВС";
         case 1 :
@@ -128,7 +140,7 @@ function getNameOfDay(num) {
 }
 
 function getNameIDOfDay(num) {
-    switch (num) {
+    switch (num.getDay()) {
         case 0 :
             return "vs";
         case 1 :
@@ -145,4 +157,12 @@ function getNameIDOfDay(num) {
             return "sb";
 
     }
+}
+
+function getDateForDraw(date) {
+    return `${date.getDate()}`+"."+`${date.getMonth()}`+"."+`${date.getFullYear()}`
+}
+
+function highlightsToday() {
+    document.getElementsByClassName("days")[0].classList.add("now");
 }

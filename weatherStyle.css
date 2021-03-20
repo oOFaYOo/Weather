@@ -139,9 +139,23 @@ body{
 .info:hover{
     cursor: pointer;
     border-bottom: solid 2px #ffffff;
+
 }
 
 .min_day_temp{
     font-size: 16pt;
     font-family: sans-serif;
+}
+
+.date{
+    font-family: Impact, sans-serif;
+    text-align: center;
+    width: 100%;
+    position: relative;
+    color: white;
+
+}
+
+.now{
+    box-shadow: 0 0 3px 2px #f6e14b;
 }
