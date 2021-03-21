@@ -5,10 +5,11 @@ body{
 }
 
 #boss{
-    top: 20%;
+    top: 25%;
     position: absolute;
     box-shadow: 0 0 200px 5px rgba(0, 0, 0, 0.5);
     border-radius: 20px;
+    z-index: 2;
 }
 
 .week{
@@ -38,7 +39,7 @@ body{
     margin: 10px 20px 0 0;
 }
 
-#search input, #search button, #search label, .get_city, .main, .info, .date{
+#search input, #search button, #search label, .get_city, .main, .info, .date, #error{
     font-family: Impact, sans-serif;
 }
 
@@ -111,11 +112,11 @@ img{
     margin-top: 3px;
 }
 
-.main{
+.main {
     font-size: 24pt;
 }
 
-.main, .info, .date{
+.main, .info, .date, #error{
     text-align: center;
 }
 
@@ -159,5 +160,19 @@ img{
 
 .now{
     border: solid 3px rgb(246, 225, 75);
-    /*box-shadow: 0 0 3px 2px #f6e14b;*/
+}
+
+#error{
+    width: 700px;
+    line-height: 40px;
+    background-color: rgba(255, 255, 255, 0.71);
+    position: absolute;
+    top: 10%;
+    z-index: 3;
+    font-size: 12pt;
+    border-radius: 20px;
+    border-bottom: #d41646 5px solid;
+    border-top: #d41646 5px solid;
+    font-family: sans-serif;
+    box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.5);
 }

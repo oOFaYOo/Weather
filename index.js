@@ -15,15 +15,18 @@ class WeatherForDay {
 }
 
 weatherSearchButton.click(() => {
-    let nameOfCity = searchCity.value;
-    searchCity.value = "";
-    document.getElementsByClassName("week")[0].innerHTML = "";
-    document.getElementsByClassName("get_city")[0].innerHTML = "";
-    return mainFunction(nameOfCity);
+    if (searchCity.value !== "") {
+        let nameOfCity = searchCity.value;
+        searchCity.value = "";
+        document.getElementsByClassName("week")[0].innerHTML = "";
+        document.getElementsByClassName("get_city")[0].innerHTML = "";
+        return mainFunction(nameOfCity);
+    }
 });
 
 async function mainFunction(nameOfCity) {
-    let weatherForWeek = await getWeatherFromAPI(nameOfCity);
+    let weatherForWeek;
+    weatherForWeek = await getWeatherFromAPI(nameOfCity);
     for (let i = 0; i < 7; i++) {
         createsDayAndAddsToHTML(convertsWeekdayToID(new Date((weatherForWeek.daily[i].dt) * 1000)), new WeatherForDay(new Date((weatherForWeek.daily[i].dt) * 1000), weatherForWeek.daily[i].temp.max, weatherForWeek.daily[i].temp.min, weatherForWeek.daily[i].temp.morn, weatherForWeek.daily[i].temp.day, weatherForWeek.daily[i].temp.eve, weatherForWeek.daily[i].temp.night))
     }
@@ -31,8 +34,17 @@ async function mainFunction(nameOfCity) {
 }
 
 async function getWeatherFromAPI(nameOfCity) {
-    let responseWithCityCoordByCityName = await fetch("https://api.openweathermap.org/data/2.5/weather" +
-        "?q=" + `${nameOfCity}` + "&units=metric&lang=ru&appid=6b70c540feba0fdeebeb7eb39708b7e7", {method: "GET"});
+    let responseWithCityCoordByCityName;
+    try {
+        responseWithCityCoordByCityName = await fetch("https://api.openweathermap.org/data/2.5/weather" +
+            "?q=" + `${nameOfCity}` + "&units=metric&lang=ru&appid=6b70c540feba0fdeebeb7eb39708b7e7", {method: "GET"});
+        if (responseWithCityCoordByCityName.status !== 200) {
+            throw new Error("Запрос завершился с ошибкой. Код ошибки:" + `${responseWithCityCoordByCityName.status}`)
+        }
+    } catch (e) {
+        console.log(e);
+        showsErrorUnknownCity();
+    }
     let objectWithCityCoordAndName = await responseWithCityCoordByCityName.json();
     let lon = objectWithCityCoordAndName.coord.lon;
     let lat = objectWithCityCoordAndName.coord.lat;
@@ -41,7 +53,6 @@ async function getWeatherFromAPI(nameOfCity) {
         "current,minutely,alerts&lang=ru&units=metric&appid=6b70c540feba0fdeebeb7eb39708b7e7", {method: "GET"});
     let objectWithWeatherData = await responseWithWeatherData.json();
     showCityNameAtHTML(objectWithCityCoordAndName.name);
-    console.log(objectWithWeatherData);
     return objectWithWeatherData;
 }
 
@@ -132,3 +143,7 @@ function accentuatesToday() {
     document.getElementsByClassName("days")[0].classList.add("now");
 }
 
+function showsErrorUnknownCity() {
+    $('#error').fadeToggle();
+    setTimeout(()=>{$('#error').fadeToggle(); $('#error').hidden=true}, 2500);
+}
