@@ -25,12 +25,13 @@ weatherSearchButton.click(() => {
 });
 
 async function mainFunction(nameOfCity) {
-    let weatherForWeek;
-    weatherForWeek = await getWeatherFromAPI(nameOfCity);
-    for (let i = 0; i < 7; i++) {
-        createsDayAndAddsToHTML(convertsWeekdayToID(new Date((weatherForWeek.daily[i].dt) * 1000)), new WeatherForDay(new Date((weatherForWeek.daily[i].dt) * 1000), weatherForWeek.daily[i].temp.max, weatherForWeek.daily[i].temp.min, weatherForWeek.daily[i].temp.morn, weatherForWeek.daily[i].temp.day, weatherForWeek.daily[i].temp.eve, weatherForWeek.daily[i].temp.night))
+    let weatherForWeek = await getWeatherFromAPI(nameOfCity);
+    if (weatherForWeek !== undefined) {
+        for (let i = 0; i < 7; i++) {
+            createsDayAndAddsToHTML(convertsWeekdayToID(new Date((weatherForWeek.daily[i].dt) * 1000)), new WeatherForDay(new Date((weatherForWeek.daily[i].dt) * 1000), weatherForWeek.daily[i].temp.max, weatherForWeek.daily[i].temp.min, weatherForWeek.daily[i].temp.morn, weatherForWeek.daily[i].temp.day, weatherForWeek.daily[i].temp.eve, weatherForWeek.daily[i].temp.night))
+        }
+        accentuatesToday();
     }
-    accentuatesToday();
 }
 
 async function getWeatherFromAPI(nameOfCity) {
@@ -44,6 +45,7 @@ async function getWeatherFromAPI(nameOfCity) {
     } catch (e) {
         console.log(e);
         showsErrorUnknownCity();
+        return;
     }
     let objectWithCityCoordAndName = await responseWithCityCoordByCityName.json();
     let lon = objectWithCityCoordAndName.coord.lon;
@@ -100,7 +102,7 @@ function switchesWeather(nameOfDay) {
 function convertsDateToWeekdayName(date) {
     switch (date.getDay()) {
         case 0 :
-        return "ВС";
+            return "ВС";
         case 1 :
             return "ПН";
         case 2 :
@@ -136,7 +138,7 @@ function convertsWeekdayToID(date) {
 }
 
 function createsDateForAddToHTML(date) {
-    return `${date.getDate()}`+"."+`${date.getMonth()}`+"."+`${date.getFullYear()}`
+    return `${date.getDate()}` + "." + `${date.getMonth()}` + "." + `${date.getFullYear()}`
 }
 
 function accentuatesToday() {
@@ -145,5 +147,8 @@ function accentuatesToday() {
 
 function showsErrorUnknownCity() {
     $('#error').fadeToggle();
-    setTimeout(()=>{$('#error').fadeToggle(); $('#error').hidden=true}, 2500);
+    setTimeout(() => {
+        $('#error').fadeToggle();
+        $('#error').hidden = true
+    }, 2500);
 }
