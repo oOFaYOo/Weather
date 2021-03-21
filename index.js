@@ -150,5 +150,5 @@ function showsErrorUnknownCity() {
     setTimeout(() => {
         $('#error').fadeToggle();
         $('#error').hidden = true
-    }, 2500);
+    }, 3500);
 }
