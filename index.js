@@ -1,126 +1,125 @@
 const searchCity = document.getElementById('set_city');
 const weatherSearchButton = $('#getWeather');
+const apiKey = "6b70c540feba0fdeebeb7eb39708b7e7";
 
 class WeatherForDay {
     constructor(date, maxTemp, minTemp, morn, day, eve, night) {
-        this.dayOfWeek = convertsDateToWeekdayName(date);
+        this.dayOfWeek = convertDateToWeekdayName(date);
         this.maxTemp = maxTemp;
         this.minTemp = minTemp;
         this.morn = morn;
         this.day = day;
         this.eve = eve;
         this.night = night;
-        this.date = createsDateForAddToHTML(date);
+        this.date = createDateForAddToHTML(date);
     }
 }
 
 weatherSearchButton.click(() => {
-    //CR: Пользуйся приведением типов.
-    //CR: if (searchCity.value) {
-    if (searchCity.value !== "") {
+    if (searchCity.value) {
         let nameOfCity = searchCity.value;
         searchCity.value = "";
         document.getElementsByClassName("week")[0].innerHTML = "";
         document.getElementsByClassName("get_city")[0].innerHTML = "";
-        return mainFunction(nameOfCity);
+        return showWeatherForCity(nameOfCity);
     }
 });
 
-
-//CR: Тут как-раз можно придумать название функции. Например showWeatherForCity. 
-async function mainFunction(nameOfCity) {
-    let weatherForWeek = await getWeatherFromAPI(nameOfCity);
-    //CR: if (weatherForWeek) {
-    if (weatherForWeek !== undefined) {
+async function showWeatherForCity(nameOfCity) {
+    let responseWithWeatherForWeek = await getWeatherFromAPI(nameOfCity, apiKey);
+    if (responseWithWeatherForWeek) {
+        let weatherForWeek = responseWithWeatherForWeek.objectWithWeatherData;
         for (let i = 0; i < 7; i++) {
-            //CR: Обращай внимание на длину строки кода. Можно либо отформатировать, либо разбить на отдельные переменные.
-            createsDayAndAddsToHTML(convertsWeekdayToID(new Date((weatherForWeek.daily[i].dt) * 1000)), new WeatherForDay(new Date((weatherForWeek.daily[i].dt) * 1000), weatherForWeek.daily[i].temp.max, weatherForWeek.daily[i].temp.min, weatherForWeek.daily[i].temp.morn, weatherForWeek.daily[i].temp.day, weatherForWeek.daily[i].temp.eve, weatherForWeek.daily[i].temp.night))
+            let id = convertWeekdayToID(new Date((weatherForWeek.daily[i].dt) * 1000));
+            let weatherForDay = new WeatherForDay(
+                new Date((weatherForWeek.daily[i].dt) * 1000),
+                weatherForWeek.daily[i].temp.max,
+                weatherForWeek.daily[i].temp.min,
+                weatherForWeek.daily[i].temp.morn,
+                weatherForWeek.daily[i].temp.day,
+                weatherForWeek.daily[i].temp.eve,
+                weatherForWeek.daily[i].temp.night);
+            createDayAndAddsToHTML(id, weatherForDay);
+            bindWeatherSwitching(id);
         }
-        accentuatesToday();
+        showCityNameAtHTML(responseWithWeatherForWeek.nameOfCityForHTML);
+        addBorderForToday();
     }
 }
 
-//CR: Всякие штуки, которые могут меняться, лучше не хардкодить, а получать откуда-то сверху. Тут речь про apiKey'и. В принципе их вообще в исходниках быть не должно.
-async function getWeatherFromAPI(nameOfCity) {
+async function getWeatherFromAPI(nameOfCity, apiKey) {
     let responseWithCityCoordByCityName;
-
-    //CR: Лучше пользоваться интерполяцией (`${value}`) строк вместо конкатенации (сложения). Так меньше вероятность допустить ошибку.
-    //CR: Также писать `${nameOfCity}` бессмысленно, если кроме nameOfCity в данной строке ничего нет. Получится то же самое, что было.
     try {
         responseWithCityCoordByCityName = await fetch("https://api.openweathermap.org/data/2.5/weather" +
-            "?q=" + `${nameOfCity}` + "&units=metric&lang=ru&appid=6b70c540feba0fdeebeb7eb39708b7e7", {method: "GET"});
+            `?q=${nameOfCity}&units=metric&lang=ru&appid=${apiKey}`, {method: "GET"});
         if (responseWithCityCoordByCityName.status !== 200) {
-            throw new Error("Запрос завершился с ошибкой. Код ошибки:" + `${responseWithCityCoordByCityName.status}`)
+            throw new Error(`Запрос завершился с ошибкой. Код ошибки: ${responseWithCityCoordByCityName.status}`)
         }
     } catch (e) {
-        //CR: Ошибки лучше писать через console.error();
-        console.log(e);
-        showsErrorUnknownCity();
+        console.error(e);
+        showUnknownCityError();
         return;
     }
     let objectWithCityCoordAndName = await responseWithCityCoordByCityName.json();
     let lon = objectWithCityCoordAndName.coord.lon;
     let lat = objectWithCityCoordAndName.coord.lat;
-    let responseWithWeatherData = await fetch("https://api.openweathermap.org/data/2.5/" +
-        "onecall?lat=" + `${lat}` + "&lon=" + `${lon}` + "&exclude=hourly," +
-        "current,minutely,alerts&lang=ru&units=metric&appid=6b70c540feba0fdeebeb7eb39708b7e7", {method: "GET"});
-    //CR: Тут аналогично может быть неуспешный код ответа и желательно это обрабатывать
-    let objectWithWeatherData = await responseWithWeatherData.json();
-
-    //CR: Вызов этой функции здесь лишний. getWeatherFromAPI всего лишь получает данные от api и ему незачем что-то знать про html.
-    showCityNameAtHTML(objectWithCityCoordAndName.name);
-    return objectWithWeatherData;
+    let responseWithWeatherData;
+    try {
+    responseWithWeatherData = await fetch("https://api.openweathermap.org/data/2.5/" +
+        `onecall?lat=${lat}&lon=${lon}&exclude=hourly,` +
+        `current,minutely,alerts&lang=ru&units=metric&appid=${apiKey}`, {method: "GET"});
+        if (responseWithWeatherData.status !== 200) {
+            throw new Error(`Запрос завершился с ошибкой. Код ошибки: ${responseWithWeatherData.status}`)
+        }
+    } catch (e) {
+        console.error(e);
+        return;
+    }
+    let objForResult = {
+        nameOfCityForHTML : objectWithCityCoordAndName.name,
+        objectWithWeatherData: await responseWithWeatherData.json(),
+    };
+    return objForResult;
 }
 
 function showCityNameAtHTML(nameOfCity) {
-    $('.get_city').append('<span id="get_city">' + nameOfCity + '</span>');
+    $('.get_city').append(`<span id="get_city">${nameOfCity}</span>`);
 }
 
-//CR: create, а не creates
-function createsDayAndAddsToHTML(nameOfDay, weatherForDay) {
+function createDayAndAddsToHTML(nameOfDay, weatherForDay) {
     $('<div class="days"></div>').attr('id', nameOfDay).appendTo('.week');
     $(`#${nameOfDay}`).append('<div class="main">\n' +
-        '            <div class="day">' + weatherForDay.dayOfWeek + '</div>\n' +
+        `            <div class="day">${weatherForDay.dayOfWeek}</div>\n` +
         '            <div class="main_info">\n' +
-        '            <span class="max_day_temp">' + `${weatherForDay.maxTemp}` + '</span><br>\n' +
-        '            <span class="min_day_temp">' + `${weatherForDay.minTemp}` + '</span>\n' +
+        `            <span class="max_day_temp">${weatherForDay.maxTemp}</span><br>\n` +
+        `            <span class="min_day_temp">${weatherForDay.minTemp}</span>\n` +
         '            </div>\n' +
         '        </div>\n' +
         '        <div class="moreInfo">\n' +
         '            <div class="info" hidden>\n' +
-        '                <span class="morn_temp">Утро: ' + `${weatherForDay.morn}` + '</span><br>\n' +
-        '                <span class="day_temp">День: ' + `${weatherForDay.day}` + '</span><br>\n' +
-        '                <span class="ev_temp">Вечер: ' + `${weatherForDay.eve}` + '</span><br>\n' +
-        '                <span class="night_temp">Ночь: ' + `${weatherForDay.night}` + '</span>\n' +
+        `                <span class="morn_temp">Утро: ${weatherForDay.morn}</span><br>\n` +
+        `                <span class="day_temp">День: ${weatherForDay.day}</span><br>\n` +
+        `                <span class="ev_temp">Вечер: ${weatherForDay.eve}</span><br>\n` +
+        `                <span class="night_temp">Ночь: ${weatherForDay.night}</span>\n` +
         '            </div><br>\n' +
-        '            <div class="date">' + `${weatherForDay.date}` + '</div>\n' +
+        `            <div class="date">${weatherForDay.date}</div>\n` +
         '        </div>');
-    switchesWeather(nameOfDay);
 }
 
-//CR: switch, а не switches.
-//CR: ну и по факту функция не переключает ничего, а навешивает обработчик. bindWeatherSwitching
-function switchesWeather(nameOfDay) {
-    //CR: Лучше использовать интерполяцию. Меньше вероятность ошибки при формировании селектора.
-    let id = '#' + nameOfDay;
-    $(`${id} .main_info`).click(function () {
-        $(id + ' .info').slideDown();
-        $(id + ' .main_info').slideUp();
-        $(id + ' .main_info').hidden = true;
-        $(id + ' .date').fadeToggle();
-        $(id + ' .date').hidden = true;
+function bindWeatherSwitching(nameOfDay) {
+    $(`#${nameOfDay} .main_info`).click(function () {
+        $(`#${nameOfDay} .info`).slideDown();
+        $(`#${nameOfDay} .main_info`).slideUp().hidden = true;
+        $(`#${nameOfDay} .date`).fadeToggle().hidden = true;
     });
-    $(id + ' .info').click(function () {
-        $(id + ' .info').slideUp();
-        $(id + ' .main_info').slideDown();
-        $(id + ' .date').fadeToggle();
+    $(`#${nameOfDay} .info`).click(function () {
+        $(`#${nameOfDay} .info`).slideUp();
+        $(`#${nameOfDay} .main_info`).slideDown();
+        $(`#${nameOfDay} .date`).fadeToggle();
     });
 }
 
-//CR: convert, а не converts
-function convertsDateToWeekdayName(date) {
-    //CR: В таких switch'ах лучше писать в конце default явно и кидать там ошибку, например.
-    //CR: А то так он штатно вернет underfined в случае некорректных данных и код развалится где-то выше, либо что хуже, будет работать некорректно.
+function convertDateToWeekdayName(date) {
     switch (date.getDay()) {
         case 0 :
             return "ВС";
@@ -136,11 +135,12 @@ function convertsDateToWeekdayName(date) {
             return "ПТ";
         case 6 :
             return "СБ";
+        default:
+            throw new Error(`Unknown day type: ${date.getDay()}`);
     }
 }
 
-//CR: То же самое замечание, что выше
-function convertsWeekdayToID(date) {
+function convertWeekdayToID(date) {
     switch (date.getDay()) {
         case 0 :
             return "vs";
@@ -156,26 +156,22 @@ function convertsWeekdayToID(date) {
             return "pt";
         case 6 :
             return "sb";
+        default:
+            throw new Error(`Unknown day type: ${date.getDay()}`);
     }
 }
 
-//CR: create, а не creates.
-function createsDateForAddToHTML(date) {
-    //CR: Нет смысла использовать и интерполяцию строк и сложение. Лучше использовать только интерполяцию:
-    //CR: `${date.getDate()}.${date.getMonth()}.{date.getFullYear()}`
-    return `${date.getDate()}` + "." + `${date.getMonth()}` + "." + `${date.getFullYear()}`
+function createDateForAddToHTML(date) {
+    return `${date.getDate()}.${date.getMonth()}.${date.getFullYear()}`
 }
 
-//CR: selectCurrentDay или addBorderForToday выглядят понятнее.
-function accentuatesToday() {
+function addBorderForToday() {
     document.getElementsByClassName("days")[0].classList.add("now");
 }
 
-//CR: showError а не showsError. И лучше showUnknownCityError. Так грамотнее.
-function showsErrorUnknownCity() {
+function showUnknownCityError() {
     $('#error').fadeToggle();
     setTimeout(() => {
-        $('#error').fadeToggle();
-        $('#error').hidden = true;
+        $('#error').fadeToggle().hidden = true;
     }, 3500);
 }
