@@ -1,7 +1,6 @@
 body{
     display: flex;
     justify-content: center;
-
     width: 100%;
     height: 100%;
     margin: 0;
@@ -12,10 +11,12 @@ body{
 #boss{
     top: 20%;
     position: absolute;
+    box-shadow: 0 0 150px 5px rgba(0, 0, 0, 0.51);
+    border-radius: 20px;
 }
 
 .week{
-    background-color: rgba(172, 224, 235, 0.50);
+    background-color: rgba(172, 224, 235, 0.6);
     width: 750px;
     border-radius: 0 0 20px 20px;
     height: 195px;
@@ -24,18 +25,18 @@ body{
     flex-direction: row;
 }
 
-.days{
-    margin: 10px 20px 0 0;
-}
-
 #search{
-    background-color: rgb(246, 225, 75);
+    background-color: rgba(246, 225, 75, 0.85);
     width: 750px;
     height: 70px;
     border-radius: 20px 20px 0 0;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.days{
+    margin: 10px 20px 0 0;
 }
 
 #search input, #search button{
@@ -66,6 +67,7 @@ body{
 
 #search button:hover{
     cursor: pointer;
+    background-color: white;
 }
 
 #search input:focus, #search button:focus {
@@ -76,12 +78,8 @@ body{
     transform: translateY(3px);
 }
 
-#search button:hover{
-    background-color: white;
-}
-
 .get_city{
-    background: linear-gradient(to bottom, #7bbccb 30%, rgba(172, 224, 235, 0.5) 100%);
+    background: linear-gradient(to bottom, #7bbccb 30%, rgba(172, 224, 235, 0.6) 100%);
     font-size: 22pt;
     font-family: Impact, sans-serif;
     width: 665px;
@@ -92,8 +90,8 @@ body{
 #get_city{
     border-bottom: #000000 solid 2px;
     border-radius: 5px;
-    padding-left: 10px;
-    padding-right: 10px;
+    /*padding-left: 5px;*/
+    /*padding-right: 10px;*/
 }
 
 .days{
@@ -102,7 +100,17 @@ body{
     border-radius: 10px;
     height: 155px;
     width: 90px;
-    background-color: rgba(172, 224, 235, 0.31);
+    background-color: rgba(172, 224, 235, 0.6);
+}
+
+img{
+    vertical-align: middle;
+    padding: 0;
+    margin-left: 10px;
+    float: left;
+    height: 28px;
+    width: 27px;
+    margin-top: 3px;
 }
 
 .main{

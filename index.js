@@ -1,126 +1,93 @@
+const searchCity = document.getElementById('set_city');
+const weatherSearchButton = $('#getWeather');
 
-// function draw(nameOfDay , weatherDay) {
-//     $('<div class="days"></div>').attr('id', nameOfDay).appendTo('.week');
-//     $(`#${nameOfDay}`).append('<div class="main">\n' +
-//         '            <div class="day">'+`${weatherDay}`+'</div>\n' +
-//         '            <div class="main_info">\n' +
-//         '            <span class="max_day_temp">-2</span><br>\n' +
-//         '            <span class="min_day_temp">-9</span>\n' +
-//         '            </div>\n' +
-//         '        </div>\n' +
-//         '        <div class="moreInfo">\n' +
-//         '            <div class="info" hidden>\n' +
-//         '                <span class="morn_temp">Утро: -15</span><br>\n' +
-//         '                <span class="day_temp">День: -5</span><br>\n' +
-//         '                <span class="ev_temp">Вечер: -10</span><br>\n' +
-//         '                <span class="night_temp">Ночь: -17</span>\n' +
-//         '            </div>\n' +
-//         '        </div>');
-//     slide(nameOfDay);
-// }
-
-
-const setCity = document.getElementById('set_city');
-const getWeatherButton = $('#getWeather');
-
-getWeatherButton.click(() => {
-
-            let city = setCity.value;
-            setCity.value = "";
-            document.getElementsByClassName("week")[0].innerHTML = "";
-            document.getElementsByClassName("get_city")[0].innerHTML = "";
-            return nazvanie(city);
-
-    }
-);
-
-
-async function nazvanie(nameOfCity){
-    let weatherWeek = await getWeatherFromApi(nameOfCity); //вернет объект с данными по темпиратурке, а не промис
-    for(let i = 0; i < 7; i++){
-        draw(getNameIDOfDay(new Date((weatherWeek.daily[i].dt)*1000)), new WeatherDay(new Date((weatherWeek.daily[i].dt)*1000), weatherWeek.daily[i].temp.max, weatherWeek.daily[i].temp.min, weatherWeek.daily[i].temp.morn, weatherWeek.daily[i].temp.day, weatherWeek.daily[i].temp.eve, weatherWeek.daily[i].temp.night))
-    }
-    highlightsToday();
-}
-
-
-async function getWeatherFromApi(nameOfCity) {
-    let response0 = await fetch("http://api.openweathermap.org/data/2.5/" +
-        "weather?q="+`${nameOfCity}`+"&units=metric&lang=ru&appid=6b70c540feba0fdeebeb7eb39708b7e7", {method: "GET"});
-    let response1 = await response0.json();
-    let lon = response1.coord.lon;
-    let lat = response1.coord.lat;
-    let response2 = await fetch("https://api.openweathermap.org/data/2.5/" +
-        "onecall?lat="+`${lat}`+"&lon="+`${lon}`+"&exclude=hourly," +
-        "current,minutely,alerts&lang=ru&units=metric&appid=6b70c540feba0fdeebeb7eb39708b7e7", {method:"GET"});
-    let response3 = await response2.json();
-    drawGetCity(response1.name);
-    console.log(response3);
-    return response3;
-}
-
-function drawGetCity(nameOfCity) {
-    $('.get_city').append('<span id="get_city">'+nameOfCity+'</span>');
-}
-
-
-function draw(nameOfDay, weatherDay) {
-    $('<div class="days"></div>').attr('id', nameOfDay).appendTo('.week');
-    $(`#${nameOfDay}`).append('<div class="main">\n' +
-        '            <div class="day">' + weatherDay.weekDay + '</div>\n' +
-        '            <div class="main_info">\n' +
-        '            <span class="max_day_temp">' + `${weatherDay.maxTemp}` + '</span><br>\n' +
-        '            <span class="min_day_temp">' + `${weatherDay.minTemp}` + '</span>\n' +
-        '            </div>\n' +
-        '        </div>\n' +
-        '        <div class="moreInfo">\n' +
-        '            <div class="info" hidden>\n' +
-        '                <span class="morn_temp">Утро: ' + `${weatherDay.morn}` + '</span><br>\n' +
-        '                <span class="day_temp">День: ' + `${weatherDay.day}` + '</span><br>\n' +
-        '                <span class="ev_temp">Вечер: ' + `${weatherDay.eve}` + '</span><br>\n' +
-        '                <span class="night_temp">Ночь: ' + `${weatherDay.night}` + '</span>\n' +
-        '            </div><br>\n' +
-        '            <div class="date">' + `${weatherDay.date}` + '</div>\n' +
-        '        </div>');
-    slide(nameOfDay);
-}
-
-
-
-function slide (nameOfDay) {
-    let id = '#'+ nameOfDay;
-    $(`${id} .main_info`).click(function () {
-        $(id + ' .info').slideDown();
-        $(id + ' .main_info').slideUp();
-        $(id + ' .main_info').hidden = true;
-
-        $(id + ' .date').fadeToggle();
-        $(id + ' .date').hidden = true;
-    });
-
-    $(id + ' .info').click(function () {
-        $(id + ' .info').slideUp();
-        $(id + ' .main_info').slideDown();
-
-        $(id + ' .date').fadeToggle();
-    });
-}
-
-class WeatherDay {
+class WeatherForDay {
     constructor(date, maxTemp, minTemp, morn, day, eve, night) {
-        this.weekDay = getNameOfDay(date);
+        this.dayOfWeek = convertsDateToWeekdayName(date);
         this.maxTemp = maxTemp;
         this.minTemp = minTemp;
         this.morn = morn;
         this.day = day;
         this.eve = eve;
         this.night = night;
-        this.date = getDateForDraw(date);
+        this.date = createsDateForAddToHTML(date);
     }
 }
 
-function getNameOfDay(num) {
-    switch (num.getDay()) {
+weatherSearchButton.click(() => {
+    let nameOfCity = searchCity.value;
+    searchCity.value = "";
+    document.getElementsByClassName("week")[0].innerHTML = "";
+    document.getElementsByClassName("get_city")[0].innerHTML = "";
+    return mainFunction(nameOfCity);
+});
+
+async function mainFunction(nameOfCity) {
+    let weatherForWeek = await getWeatherFromAPI(nameOfCity);
+    for (let i = 0; i < 7; i++) {
+        createsDayAndAddsToHTML(convertsWeekdayToID(new Date((weatherForWeek.daily[i].dt) * 1000)), new WeatherForDay(new Date((weatherForWeek.daily[i].dt) * 1000), weatherForWeek.daily[i].temp.max, weatherForWeek.daily[i].temp.min, weatherForWeek.daily[i].temp.morn, weatherForWeek.daily[i].temp.day, weatherForWeek.daily[i].temp.eve, weatherForWeek.daily[i].temp.night))
+    }
+    accentuatesToday();
+}
+
+async function getWeatherFromAPI(nameOfCity) {
+    let responseWithCityCoordByCityName = await fetch("https://api.openweathermap.org/data/2.5/weather" +
+        "?q=" + `${nameOfCity}` + "&units=metric&lang=ru&appid=6b70c540feba0fdeebeb7eb39708b7e7", {method: "GET"});
+    let objectWithCityCoordAndName = await responseWithCityCoordByCityName.json();
+    let lon = objectWithCityCoordAndName.coord.lon;
+    let lat = objectWithCityCoordAndName.coord.lat;
+    let responseWithWeatherData = await fetch("https://api.openweathermap.org/data/2.5/" +
+        "onecall?lat=" + `${lat}` + "&lon=" + `${lon}` + "&exclude=hourly," +
+        "current,minutely,alerts&lang=ru&units=metric&appid=6b70c540feba0fdeebeb7eb39708b7e7", {method: "GET"});
+    let objectWithWeatherData = await responseWithWeatherData.json();
+    showCityNameAtHTML(objectWithCityCoordAndName.name);
+    console.log(objectWithWeatherData);
+    return objectWithWeatherData;
+}
+
+function showCityNameAtHTML(nameOfCity) {
+    $('.get_city').append('<span id="get_city">' + nameOfCity + '</span>');
+}
+
+function createsDayAndAddsToHTML(nameOfDay, weatherForDay) {
+    $('<div class="days"></div>').attr('id', nameOfDay).appendTo('.week');
+    $(`#${nameOfDay}`).append('<div class="main">\n' +
+        '            <div class="day">' + weatherForDay.dayOfWeek + '</div>\n' +
+        '            <div class="main_info">\n' +
+        '            <span class="max_day_temp">' + `${weatherForDay.maxTemp}` + '</span><br>\n' +
+        '            <span class="min_day_temp">' + `${weatherForDay.minTemp}` + '</span>\n' +
+        '            </div>\n' +
+        '        </div>\n' +
+        '        <div class="moreInfo">\n' +
+        '            <div class="info" hidden>\n' +
+        '                <span class="morn_temp">Утро: ' + `${weatherForDay.morn}` + '</span><br>\n' +
+        '                <span class="day_temp">День: ' + `${weatherForDay.day}` + '</span><br>\n' +
+        '                <span class="ev_temp">Вечер: ' + `${weatherForDay.eve}` + '</span><br>\n' +
+        '                <span class="night_temp">Ночь: ' + `${weatherForDay.night}` + '</span>\n' +
+        '            </div><br>\n' +
+        '            <div class="date">' + `${weatherForDay.date}` + '</div>\n' +
+        '        </div>');
+    switchesWeather(nameOfDay);
+}
+
+function switchesWeather(nameOfDay) {
+    let id = '#' + nameOfDay;
+    $(`${id} .main_info`).click(function () {
+        $(id + ' .info').slideDown();
+        $(id + ' .main_info').slideUp();
+        $(id + ' .main_info').hidden = true;
+        $(id + ' .date').fadeToggle();
+        $(id + ' .date').hidden = true;
+    });
+    $(id + ' .info').click(function () {
+        $(id + ' .info').slideUp();
+        $(id + ' .main_info').slideDown();
+        $(id + ' .date').fadeToggle();
+    });
+}
+
+function convertsDateToWeekdayName(date) {
+    switch (date.getDay()) {
         case 0 :
         return "ВС";
         case 1 :
@@ -135,12 +102,11 @@ function getNameOfDay(num) {
             return "ПТ";
         case 6 :
             return "СБ";
-
     }
 }
 
-function getNameIDOfDay(num) {
-    switch (num.getDay()) {
+function convertsWeekdayToID(date) {
+    switch (date.getDay()) {
         case 0 :
             return "vs";
         case 1 :
@@ -155,14 +121,14 @@ function getNameIDOfDay(num) {
             return "pt";
         case 6 :
             return "sb";
-
     }
 }
 
-function getDateForDraw(date) {
+function createsDateForAddToHTML(date) {
     return `${date.getDate()}`+"."+`${date.getMonth()}`+"."+`${date.getFullYear()}`
 }
 
-function highlightsToday() {
+function accentuatesToday() {
     document.getElementsByClassName("days")[0].classList.add("now");
 }
+
