@@ -1,37 +1,36 @@
 body{
-    display: flex;
-    justify-content: center;
     width: 100%;
     height: 100%;
-    margin: 0;
-    padding: 0;
     background-image: url("back_image.jpg");
 }
 
 #boss{
     top: 20%;
     position: absolute;
-    box-shadow: 0 0 150px 5px rgba(0, 0, 0, 0.51);
+    box-shadow: 0 0 200px 5px rgba(0, 0, 0, 0.5);
     border-radius: 20px;
 }
 
 .week{
     background-color: rgba(172, 224, 235, 0.6);
-    width: 750px;
     border-radius: 0 0 20px 20px;
     height: 195px;
+    flex-direction: row;
+}
+
+#search, .week, body{
     display: flex;
     justify-content: center;
-    flex-direction: row;
+}
+
+#search, .week{
+    width: 750px;
 }
 
 #search{
     background-color: rgba(246, 225, 75, 0.85);
-    width: 750px;
     height: 70px;
     border-radius: 20px 20px 0 0;
-    display: flex;
-    justify-content: center;
     align-items: center;
 }
 
@@ -39,9 +38,12 @@ body{
     margin: 10px 20px 0 0;
 }
 
+#search input, #search button, #search label, .get_city, .main, .info, .date{
+    font-family: Impact, sans-serif;
+}
+
 #search input, #search button{
     font-size: 14pt;
-    font-family: Impact, sans-serif;
     margin-left: 13px;
     border-radius: 15px;
     border-style: none;
@@ -49,7 +51,6 @@ body{
 
 #search label{
     font-size: 16pt;
-    font-family: Impact, sans-serif;
 }
 
 #search input{
@@ -81,7 +82,6 @@ body{
 .get_city{
     background: linear-gradient(to bottom, #7bbccb 30%, rgba(172, 224, 235, 0.6) 100%);
     font-size: 22pt;
-    font-family: Impact, sans-serif;
     width: 665px;
     height: 30px;
     padding: 10px 0 10px 85px;
@@ -90,8 +90,6 @@ body{
 #get_city{
     border-bottom: #000000 solid 2px;
     border-radius: 5px;
-    /*padding-left: 5px;*/
-    /*padding-right: 10px;*/
 }
 
 .days{
@@ -100,7 +98,7 @@ body{
     border-radius: 10px;
     height: 155px;
     width: 90px;
-    background-color: rgba(172, 224, 235, 0.6);
+    background-color: rgba(172, 224, 235, 0.5);
 }
 
 img{
@@ -114,9 +112,11 @@ img{
 }
 
 .main{
-    text-align: center;
     font-size: 24pt;
-    font-family: Impact, sans-serif;
+}
+
+.main, .info, .date{
+    text-align: center;
 }
 
 .day{
@@ -138,16 +138,12 @@ img{
 
 .info{
     font-size: 13pt;
-    font-family: Impact, sans-serif;
-    text-align: center;
     border-radius: 10px;
 }
-
 
 .info:hover{
     cursor: pointer;
     border-bottom: solid 2px #ffffff;
-
 }
 
 .min_day_temp{
@@ -156,14 +152,12 @@ img{
 }
 
 .date{
-    font-family: Impact, sans-serif;
-    text-align: center;
     width: 100%;
     position: relative;
     color: white;
-
 }
 
 .now{
-    box-shadow: 0 0 3px 2px #f6e14b;
+    border: solid 3px rgb(246, 225, 75);
+    /*box-shadow: 0 0 3px 2px #f6e14b;*/
 }
