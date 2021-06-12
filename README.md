@@ -4,6 +4,8 @@ Website with weather display. On the home weather screen for the week, the minim
 
 Tested only on Google Chrome.
 
+Hosted instance: https://oofayoo-weather.herokuapp.com/
+
 Fifth experience in writing projects using HTML5, CSS3, JS
 
 First experience of using asynchronous programming(async/await, promise), interaction with API of other sites, jQuery
