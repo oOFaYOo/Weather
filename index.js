@@ -1,3 +1,4 @@
+
 const searchCity = document.getElementById('set_city');
 const weatherSearchButton = $('#getWeather');
 const apiKey = "6b70c540feba0fdeebeb7eb39708b7e7";
@@ -30,9 +31,10 @@ async function showWeatherForCity(nameOfCity) {
     if (responseWithWeatherForWeek) {
         let weatherForWeek = responseWithWeatherForWeek.objectWithWeatherData;
         for (let i = 0; i < 7; i++) {
-            let id = convertWeekdayToID(new Date((weatherForWeek.daily[i].dt) * 1000));
+            let date = new Date((weatherForWeek.daily[i].dt) * 1000);
+            let id = convertWeekdayToID(date);
             let weatherForDay = new WeatherForDay(
-                new Date((weatherForWeek.daily[i].dt) * 1000),
+                date,
                 weatherForWeek.daily[i].temp.max,
                 weatherForWeek.daily[i].temp.min,
                 weatherForWeek.daily[i].temp.morn,
@@ -162,7 +164,7 @@ function convertWeekdayToID(date) {
 }
 
 function createDateForAddToHTML(date) {
-    return `${date.getDate()}.${date.getMonth()}.${date.getFullYear()}`
+    return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`
 }
 
 function addBorderForToday() {
