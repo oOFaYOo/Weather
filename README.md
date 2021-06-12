@@ -2,7 +2,7 @@
 
 Website with weather display. On the home weather screen for the week, the minimum and maximum temperatures for the day. When pressed, the detailed weather for the day unfolds.
 
-Works only in Google Chrome.
+Tested only on Google Chrome.
 
 Fifth experience in writing projects using HTML5, CSS3, JS
 
